@@ -1,0 +1,50 @@
+=== TASK 5: tools ===
+  get_order('ORD-999999') -> {'error': 'order not found'}
+  calculate_refund(500, 46) -> {'refund_inr': 500.0} | calculate_refund(500, 45) -> {'refund_inr': 0}
+  TOOLS_SPEC names: ['get_order', 'search_policy', 'calculate_refund', 'issue_refund', 'escalate_to_human']
+
+=== TASK 6: run all 7 scenarios (max_iterations=6, token_limit=6000, time_limit_seconds=10) ===
+  S1: expected REFUND    got REFUND                   refund   128.25 (expected 128.25) model calls 5 tokens 1122 MATCH
+      final answer: REFUND: INR 128.25 issued.
+      tools: ['get_order', 'search_policy', 'calculate_refund', 'issue_refund']
+  S2: expected REFUND    got REFUND                   refund   135.00 (expected 135.00) model calls 5 tokens 1122 MATCH
+      final answer: REFUND: INR 135.0 issued.
+      tools: ['get_order', 'search_policy', 'calculate_refund', 'issue_refund']
+  S3: expected ESCALATE  got ESCALATE                 refund  1999.00 (expected 1999.00) model calls 5 tokens 1109 MATCH
+      final answer: ESCALATE: refund above INR 1000 sent to a human lead.
+      tools: ['get_order', 'search_policy', 'calculate_refund', 'escalate_to_human']
+  S4: expected DENIED    got DENIED                   refund     0.00 (expected 0.00) model calls 4 tokens 785 MATCH
+      final answer: DENIED: delivery was within 45 minutes.
+      tools: ['get_order', 'search_policy', 'calculate_refund']
+  S5: expected DENIED    got DENIED                   refund     0.00 (expected 0.00) model calls 3 tokens 472 MATCH
+      final answer: DENIED: only completed orders can be refunded.
+      tools: ['get_order', 'search_policy']
+  S6: expected NOT_FOUND got NOT_FOUND                refund     0.00 (expected 0.00) model calls 2 tokens 162 MATCH
+      final answer: NOT_FOUND: no such order.
+      tools: ['get_order']
+  S7: expected FALLBACK  got FALLBACK_MAX_ITERATIONS  refund     0.00 (expected 0.00) model calls 6 tokens 3270 MATCH
+      final answer: HANDOFF TO HUMAN: automated run stopped (6 model calls without a final answer). Completed 6 tool step(s) [search_policy, search_policy, search_policy, search_policy, search_policy, search_policy] using 6 model call(s) and 3270 tokens. Customer message: '[LOOP] Refund order ORD-100048.'
+      tools: ['search_policy', 'search_policy', 'search_policy', 'search_policy', 'search_policy', 'search_policy']
+  [OK ] S1 refund: got 128.25  reference 128.25
+  [OK ] S2 refund: got 135.0  reference 135.0
+  [OK ] S3 escalated amount: got 1999.0  reference 1999.0
+
+=== TASK 7: stop safely ===
+  (b) S1 with token_limit=200 -> FALLBACK_TOKEN_LIMIT; model calls 3, tokens 489, tools executed ['get_order', 'search_policy']
+      final_answer: HANDOFF TO HUMAN: automated run stopped (token limit 200 exceeded with 489 tokens). Completed 2 tool step(s) [get_order, search_policy] using 3 model call(s) and 489 tokens. Customer message: 'My order ORD-100048 reached me very late. I would like a refund.'
+  (c) S1 with time_limit_seconds=0 -> FALLBACK_TIMEOUT; model calls 0, tools []
+      final_answer: HANDOFF TO HUMAN: automated run stopped (time limit of 0 s reached). Completed 0 tool step(s) [none] using 0 model call(s) and 0 tokens. Customer message: 'My order ORD-100048 reached me very late. I would like a refund.'
+  (a) S7 -> FALLBACK_MAX_ITERATIONS after 6 model calls and 3270 tokens (default token_limit 6000 not hit)
+
+=== TASK 8: crash and resume ===
+  crash: simulated crash after tool execution #2
+  checkpoint state/demo_crash_resume_S1.json: step 2, tools executed so far ['get_order', 'search_policy'], 6 messages, tokens_used 192
+  resume_agent -> status REFUND, refund INR 128.25, final answer: REFUND: INR 128.25 issued.
+  tools executed across crash + resume, in order: ['get_order', 'search_policy', 'calculate_refund', 'issue_refund']
+
+  refund ledger lines: 4
+    issue_refund ORD-100048 128.25 run_S1
+    issue_refund ORD-100067 135.0 run_S2
+    escalate_to_human ORD-100145 1999.0 run_S3
+    issue_refund ORD-100048 128.25 demo_crash_resume_S1
+  state/ files: ['demo_crash_resume_S1.json', 'demo_token_limit_S1.json', 'run_S1.json', 'run_S2.json', 'run_S3.json', 'run_S4.json', 'run_S5.json', 'run_S6.json', 'run_S7.json']

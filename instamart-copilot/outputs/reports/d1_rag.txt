@@ -1,0 +1,61 @@
+=== TASK 1: chunking (40 words, overlap 10) ===
+  total chunks: 15; per document: {'delivery_policy.txt': 3, 'escalation_policy.txt': 3, 'payment_policy.txt': 3, 'privacy_policy.txt': 2, 'refund_policy.txt': 4}
+  [OK ] total chunks: got 15  reference 15
+  [OK ] per document: got {'delivery_policy.txt': 3, 'escalation_policy.txt': 3, 'payment_policy.txt': 3, 'privacy_policy.txt': 2, 'refund_policy.txt': 4}  reference {'delivery_policy.txt': 3, 'escalation_policy.txt': 3, 'payment_policy.txt': 3, 'privacy_policy.txt': 2, 'refund_policy.txt': 4}
+  refund_policy.txt chunk 0 words 0-39, chunk 1 starts at word 30: ['order', 'is', 'delivered'] == ['order', 'is', 'delivered']
+
+=== TASK 2: TF-IDF retrieval ===
+  vocabulary size: 200
+  refund_policy.txt      score 0.2719  order is delivered in more than 45 minutes, the customer receives a fu...
+  refund_policy.txt      score 0.2514  Refund Policy. A refund can be requested only for orders whose status ...
+  refund_policy.txt      score 0.2454  late-delivery refund is paid. Refunds up to INR 1000 are approved auto...
+  [OK ] top three chunks all from refund_policy.txt: got ['refund_policy.txt', 'refund_policy.txt', 'refund_policy.txt']  reference ['refund_policy.txt', 'refund_policy.txt', 'refund_policy.txt']
+
+=== TASK 3: one grounded answer ===
+  Q: What delivery time makes a completed order eligible for a full refund?
+  A: order is delivered in more than 45 minutes, the customer receives a full refund of the order amount.
+  sources: ['refund_policy.txt', 'refund_policy.txt', 'privacy_policy.txt']
+
+=== TASK 4: evaluation with overlap 10 (40-word chunks) ===
+    ok  doc_in_top3=True fact_in_answer=True | What delivery time makes a completed order eligible for a full refund?
+    ok  doc_in_top3=True fact_in_answer=True | Who must approve a refund above INR 1000?
+    ok  doc_in_top3=True fact_in_answer=True | How many days do I have to raise a refund request?
+    ok  doc_in_top3=True fact_in_answer=True | What is the delivery fee on small orders?
+    ok  doc_in_top3=True fact_in_answer=True | On orders of what value is delivery free?
+    ok  doc_in_top3=True fact_in_answer=True | Why does the electronics delivery need a one time password?
+    ok  doc_in_top3=True fact_in_answer=True | Is cash on delivery available for a large order?
+    ok  doc_in_top3=True fact_in_answer=True | How soon is money returned when a payment fails but is deducted?
+    ok  doc_in_top3=True fact_in_answer=True | Can wallet balance be refunded as cash?
+    ok  doc_in_top3=True fact_in_answer=True | When are delivery addresses deleted from active systems?
+    ok  doc_in_top3=True fact_in_answer=True | How fast must a fraud ticket reach the security team?
+    ok  doc_in_top3=True fact_in_answer=True | After how many steps must an automated assistant hand over to a human?
+    ok  fallback=True | What is the favourite colour of the company mascot? -> I could not find that information in the policy documents.
+    ok  fallback=True | Who won the cricket world cup final? -> I could not find that information in the policy documents.
+  answerable: expected doc in top three 12/12, expected_fact in answer 12/12; unanswerable: fallback 2/2
+  [OK ] doc hits: got 12  reference 12
+  [OK ] fact hits: got 12  reference 12
+  [OK ] fallbacks: got 2  reference 2
+
+=== TASK 4: evaluation with ZERO overlap (40-word chunks, stride 40) ===
+  total chunks with zero overlap: 13
+    FAIL doc_in_top3=True fact_in_answer=False | What delivery time makes a completed order eligible for a full refund?
+    ok  doc_in_top3=True fact_in_answer=True | Who must approve a refund above INR 1000?
+    ok  doc_in_top3=True fact_in_answer=True | How many days do I have to raise a refund request?
+    ok  doc_in_top3=True fact_in_answer=True | What is the delivery fee on small orders?
+    ok  doc_in_top3=True fact_in_answer=True | On orders of what value is delivery free?
+    ok  doc_in_top3=True fact_in_answer=True | Why does the electronics delivery need a one time password?
+    ok  doc_in_top3=True fact_in_answer=True | Is cash on delivery available for a large order?
+    FAIL doc_in_top3=True fact_in_answer=False | How soon is money returned when a payment fails but is deducted?
+    ok  doc_in_top3=True fact_in_answer=True | Can wallet balance be refunded as cash?
+    ok  doc_in_top3=True fact_in_answer=True | When are delivery addresses deleted from active systems?
+    ok  doc_in_top3=True fact_in_answer=True | How fast must a fraud ticket reach the security team?
+    ok  doc_in_top3=True fact_in_answer=True | After how many steps must an automated assistant hand over to a human?
+    ok  fallback=True | What is the favourite colour of the company mascot? -> I could not find that information in the policy documents.
+    ok  fallback=True | Who won the cricket world cup final? -> I could not find that information in the policy documents.
+  answerable: expected doc in top three 12/12, expected_fact in answer 10/12; unanswerable: fallback 2/2
+  BREAKS: 'What delivery time makes a completed order eligible for a full refund?'
+     expected fact 'more than 45 minutes'; answer was: 'receives a full refund of the order amount.'
+     the fact starts at word 34 of refund_policy.txt; zero-overlap chunk boundaries fall at words [40, 80], so the sentence is cut in two
+  BREAKS: 'How soon is money returned when a payment fails but is deducted?'
+     expected fact '48 hours'; answer was: 'If a payment fails but money is deducted, the amount is returned automatically\n  1000 must be approved by a human support lead before money is returned.'
+     the fact starts at word 41 of payment_policy.txt; zero-overlap chunk boundaries fall at words [40, 80], so the sentence is cut in two

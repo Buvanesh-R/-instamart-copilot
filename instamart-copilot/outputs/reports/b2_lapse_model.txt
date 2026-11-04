@@ -1,0 +1,64 @@
+=== TASK 4: lapse problem (cutoff 2025-09-01) ===
+  [OK ] cohort customers: got 1156  reference 1156
+  [OK ] lapsed customers: got 443  reference 443
+  lapse rate 38.32%  (reference 38.32%)
+  features: ['recency', 'frequency', 'monetary', 'avg_discount_pct', 'cancellation_rate', 'avg_delivery_minutes', 'age', 'tenure_days', 'city', 'favourite_category', 'gender']
+  no feature uses an order dated on/after the cutoff; segment labels are NOT used as features.
+  [OK ] train rows: got 924  reference 924
+  [OK ] test rows: got 232  reference 232
+  train: 924 rows (354 lapsed / 570 not lapsed)   test: 232 rows (89 lapsed / 143 not lapsed)
+  baseline always 'not lapsed': accuracy 61.6%  lapsed-class F1 0.00  (reference 61.6% / 0)
+
+=== TASK 5: preprocessing without leakage ===
+  scaler mean of frequency learned on train rows: 8.1147
+  full-cohort mean of frequency:                  8.0285
+  They differ because the scaler only ever saw the 924 training rows, while the cohort mean also includes the 232 test rows the scaler must never see.
+  confirmed in code: no feature column contains a missing value.
+  encoded matrix width: 19 columns (8 numeric + 11 one-hot with drop='first')
+
+=== TASK 6: tune and evaluate (GridSearchCV, cv=5, scoring='f1') ===
+  Logistic regression grid C in {0.01, 0.1, 1, 10, 100}: best {'clf__C': 100}  best CV F1 0.651
+  Random forest grid max_depth in {3,5,8} x min_samples_leaf in {5,10,20} (45 fits): best {'clf__max_depth': 8, 'clf__min_samples_leaf': 5}  best CV F1 0.688
+  untouched test set, lapsed class only:
+  logistic regression: TN 111 FP 32 FN 31 TP 58 | lapsed-class precision 0.644 recall 0.652 F1 0.648
+  random forest      : TN 106 FP 37 FN 32 TP 57 | lapsed-class precision 0.606 recall 0.640 F1 0.623
+  [OK ] LR test F1 (about 0.62): got 0.65  reference 0.62
+  [OK ] RF test F1 (about 0.65): got 0.62  reference 0.65
+
+  SELECTED MODEL: random forest (higher best cross-validated F1: RF 0.688 vs LR 0.651)
+  selected model test F1 = 0.623  (must be >= 0.55)
+  Cost view: it misses 32 lapsing customers (false negatives, lost future revenue) and wrongly targets 37 loyal ones (false positives, a coupon wasted). A missed lapser costs far more than a wasted coupon, so recall on the lapsed class matters at least as much as precision.
+
+=== TASK 7: class-balance experiment (oversample TRAINING rows only) ===
+  balanced training set: 570 not lapsed / 570 lapsed (reference 570 each)
+  same best logistic regression, original test set:
+  un-balanced training: TN 111 FP 32 FN 31 TP 58 | lapsed-class precision 0.644 recall 0.652 F1 0.648
+  balanced training   : TN 90 FP 53 FN 13 TP 76 | lapsed-class precision 0.589 recall 0.854 F1 0.697
+    change in precision: -0.055
+    change in recall: +0.202
+    change in f1: +0.049
+  metric that moved most: recall
+
+=== TASK 8: interpretation, persistence, retention list ===
+  top 5 random-forest feature_importances_:
+num__frequency               0.2680
+num__monetary                0.2587
+num__recency                 0.1015
+num__avg_delivery_minutes    0.0702
+num__avg_discount_pct        0.0552
+  logistic coefficient num__recency: +0.040 (raises lapse odds)
+  logistic coefficient num__frequency: -1.698 (lowers lapse odds)
+  logistic coefficient num__cancellation_rate: -0.124 (lowers lapse odds)
+  saved e:\instamart-copilot\instamart-copilot\outputs\lapse_model.joblib; reloaded model reproduces test predictions exactly: True, probabilities identical: True
+  Premium customers in the test set: 40; retention list rows: 10; of these 1 truly lapsed
+customer_id  lapse_probability  actually_lapsed
+      C0060             0.5678                0
+      C0862             0.5300                0
+      C0930             0.5251                0
+      C1112             0.5208                0
+      C0942             0.5178                0
+      C0167             0.5176                0
+      C0133             0.5049                0
+      C0802             0.4977                0
+      C0565             0.4856                1
+      C0082             0.4806                0

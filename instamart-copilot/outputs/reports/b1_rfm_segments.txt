@@ -1,0 +1,57 @@
+=== TASK 1: RFM table ===
+  [OK ] customers: got 1175  reference 1175
+  [OK ] recency median: got 19.0  reference 19
+  [OK ] recency min: got 0  reference 0
+  [OK ] recency max: got 180  reference 180
+  [OK ] frequency mean: got 9.46  reference 9.46
+  [OK ] frequency max: got 33  reference 33
+  [OK ] monetary mean: got 2552.06  reference 2552.06
+  [OK ] monetary max: got 14766.55  reference 14766.55
+
+=== TASK 2: K-means, K = 2..8 (StandardScaler, n_init=10, random_state=42) ===
+ K  inertia  silhouette
+ 2   1820.8       0.465
+ 3   1268.2       0.445
+ 4    743.1       0.526
+ 5    617.4       0.480
+ 6    503.2       0.482
+ 7    408.5       0.416
+ 8    366.5       0.412
+  [OK ] K=2 inertia (5% tol): got 1820.8  reference 1820.8
+  [OK ] K=2 silhouette (0.05 tol): got 0.465  reference 0.465
+  [OK ] K=3 inertia (5% tol): got 1268.2  reference 1268.2
+  [OK ] K=3 silhouette (0.05 tol): got 0.445  reference 0.445
+  [OK ] K=4 inertia (5% tol): got 743.1  reference 743.1
+  [OK ] K=4 silhouette (0.05 tol): got 0.526  reference 0.526
+  [OK ] K=5 inertia (5% tol): got 617.4  reference 617.4
+  [OK ] K=5 silhouette (0.05 tol): got 0.48  reference 0.481
+  [OK ] K=6 inertia (5% tol): got 503.2  reference 503.2
+  [OK ] K=6 silhouette (0.05 tol): got 0.482  reference 0.482
+  [OK ] K=7 inertia (5% tol): got 408.5  reference 408.5
+  [OK ] K=7 silhouette (0.05 tol): got 0.416  reference 0.416
+  [OK ] K=8 inertia (5% tol): got 366.5  reference 366.5
+  [OK ] K=8 silhouette (0.05 tol): got 0.412  reference 0.412
+
+Chosen K = 4
+
+=== TASK 3: segment profile (cluster numbers are only labels, no ordering) ===
+            size  mean_recency  mean_frequency  mean_monetary
+segment_id                                                   
+0            436         28.86            3.77        1057.62
+1            138         24.12            6.77        7129.70
+2            419          8.77           19.40        3410.02
+3            182        109.04            2.20         685.99
+
+names and recommended actions:
+  segment 1 -> Premium Big-Ticket Buyers  [PREMIUM]: VIP early access to electronics launches and free priority delivery
+  segment 2 -> Loyal Frequent Shoppers: Loyalty points and a basket-size bundle offer to protect the habit
+  segment 3 -> Fading At-Risk Customers: Win-back coupon on a favourite category before they churn
+  segment 0 -> Occasional Low-Spend Buyers: Light-touch nudges and a first-repeat-order discount
+segment sizes (sorted): [138, 182, 419, 436] reference about [138, 182, 419, 436]
+
+PCA(n_components=2) explained_variance_ratio_: [0.634, 0.218]  total 0.852
+  [OK ] PC1 ratio: got 0.634  reference 0.634
+  [OK ] PC2 ratio: got 0.218  reference 0.218
+  [OK ] total: got 0.852  reference 0.852
+
+wrote outputs/customer_segments.csv  rows=1175  premium rows=138  premium segment = Premium Big-Ticket Buyers

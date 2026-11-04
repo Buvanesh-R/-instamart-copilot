@@ -1,0 +1,57 @@
+Q1 (WHERE then HAVING): customers above INR 8000
+  [OK ] rows: got 30  reference 30
+customer_id  n_orders  total_spend
+      C0693         6     13776.55
+      C0082         5     12317.70
+      C0743         5     12266.85
+      C0525         6     12241.30
+      C0291         6     12150.70
+
+Q2 (three-table join): revenue by city and category
+  [OK ] rows: got 30  reference 30
+  [OK ] sum of revenue: got 2998668.8  reference 2998668.8
+  [OK ] largest cell: got 'Bengaluru / Electronics / 233,909.45'  reference 'Bengaluru / Electronics / 233,909.45'
+
+Q3 (scalar subquery): products above the average price
+  [OK ] rows: got 11  reference 11
+product_id        product_name      category  price_inr
+      P038   Bluetooth Speaker   Electronics       1999
+      P033    Wireless Earbuds   Electronics       1499
+      P034 Power Bank 10000mAh   Electronics       1299
+      P036   Phone Charger 20W   Electronics        799
+      P037          Smart Bulb   Electronics        599
+      P040    Memory Card 64GB   Electronics        549
+      P032       Sunscreen 50g Personal Care        399
+      P030   Body Lotion 400ml Personal Care        350
+      P039         Phone Stand   Electronics        349
+      P014          Ghee 500ml         Dairy        340
+      P035      USB-C Cable 1m   Electronics        299
+
+Q4 (LEFT JOIN): customers with no completed order
+  [OK ] rows: got 25  reference 25
+
+Q5 (CTE): customers above the average total spend
+  [OK ] customers: got 550  reference 550
+  [OK ] average total spend INR: got 2552.06  reference 2552.06
+
+Q6 (window functions): ranking inside each city
+          customer_id  total_spend
+city                              
+Bengaluru       C0082     12856.20
+Chennai         C0930     10151.40
+Delhi           C0291     13742.60
+Hyderabad       C0743     12730.05
+Mumbai          C0693     14766.55
+Pune            C0426     10377.10
+  [OK ] top customer Bengaluru: got ('C0082', 12856.2)  reference ('C0082', 12856.2)
+  [OK ] top customer Chennai: got ('C0930', 10151.4)  reference ('C0930', 10151.4)
+  [OK ] top customer Delhi: got ('C0291', 13742.6)  reference ('C0291', 13742.6)
+  [OK ] top customer Hyderabad: got ('C0743', 12730.05)  reference ('C0743', 12730.05)
+  [OK ] top customer Mumbai: got ('C0693', 14766.55)  reference ('C0693', 14766.55)
+  [OK ] top customer Pune: got ('C0426', 10377.1)  reference ('C0426', 10377.1)
+  [OK ] rows where RANK() differs from ROW_NUMBER(): got 8  reference 8
+  rows where DENSE_RANK() differs from RANK(): 271
+
+Q7 (running total): daily completed revenue
+  [OK ] daily rows: got 183  reference 183
+  [OK ] last cumulative INR: got 2998668.8  reference 2998668.8

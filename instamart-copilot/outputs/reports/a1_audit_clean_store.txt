@@ -1,0 +1,77 @@
+=== TASK 2: RAW DATA AUDIT ===
+
+-- customers: shape (1200, 5)
+               dtype  missing  missing_pct
+customer_id      str        0         0.00
+city             str        0         0.00
+signup_date      str        0         0.00
+age          float64       61         5.08
+gender           str       30         2.50
+
+-- products: shape (40, 4)
+              dtype  missing  missing_pct
+product_id      str        0          0.0
+product_name    str        0          0.0
+category        str        0          0.0
+price_inr     int64        0          0.0
+
+-- orders: shape (13084, 9)
+                    dtype  missing  missing_pct
+order_id              str        0         0.00
+customer_id           str        0         0.00
+product_id            str        0         0.00
+quantity            int64        0         0.00
+order_ts              str        0         0.00
+status                str        0         0.00
+discount_pct        int64        0         0.00
+order_amount          str        0         0.00
+delivery_minutes  float64     2541        19.42
+
+-- tickets: shape (164, 5)
+              dtype  missing  missing_pct
+ticket_id       str        0         0.00
+customer_id     str        0         0.00
+order_id        str        8         4.88
+text            str        4         2.44
+true_category   str        0         0.00
+
+-- audit figures
+  raw orders.csv rows: 13084
+  exact duplicate rows: 119
+  rows with status pending: 656
+  distinct order_id: 12309
+  non-numeric order_amount: 120
+  negative delivery_minutes: 106
+  blank delivery_minutes: 2541
+  customers: blank age: 61
+  customers: age outside 10-100: 6
+  customers: distinct raw city: 24
+  customers: distinct non-blank gender: 10
+  customers: blank gender: 30
+
+=== TASK 3: CLEAN customers ===
+  ages missing before fill (blank + impossible): 67
+  filled ages that are not whole numbers: 21
+  city counts: {'Pune': 227, 'Delhi': 210, 'Bengaluru': 197, 'Chennai': 191, 'Hyderabad': 191, 'Mumbai': 184}
+  gender counts: {'female': 610, 'male': 560, 'unknown': 30}
+  missing ages: 0  min/max age: 18.0/60.0
+
+=== TASK 4: CLEAN orders ===
+  start rows: 13084
+  rule ii  exact duplicates removed: 119  -> 12965 rows
+  rule iii older records of the same order_id removed: 656  -> 12309 rows
+  rule iv  order_amount filled from product price: 112
+  rule v   negative delivery_minutes set to missing: 105
+  rule v   completed orders: delivery_minutes filled with category median: 774
+  category medians used: {'Dairy': 25.0, 'Electronics': 25.0, 'Grocery': 25.0, 'Personal Care': 25.5, 'Snacks': 25.0}
+  clean rows: 12309 (one per order_id: True)
+  status counts: {'completed': 11110, 'cancelled': 1199}  pending left: 0
+  missing order_amount: 0
+  missing delivery_minutes: completed 0 cancelled 1199
+  sum of order_amount over completed orders: INR 2,998,668.80
+
+=== TASK 5: STORE ===
+  table customers: 1200 rows
+  table products: 40 rows
+  table orders: 12309 rows
+  wrote data/clean/*.csv and data/instamart.db

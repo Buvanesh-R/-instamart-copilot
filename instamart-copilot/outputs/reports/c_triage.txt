@@ -1,0 +1,119 @@
+=== TASK 1: input guardrails ===
+  [OK ] empty tickets: got 4  reference 4
+  [OK ] long tickets: got 4  reference 4
+  estimated tokens of the long tickets: [734, 734, 734, 734] (reference 734)
+
+=== TASK 2: personal-information redaction ===
+  substitutions: emails 55, phones 91, order ids 132, total 278
+  [OK ] emails: got 55  reference 55
+  [OK ] phones: got 91  reference 91
+  [OK ] order ids: got 132  reference 132
+  [OK ] total: got 278  reference 278
+  [OK ] patterns left after redaction: got 0  reference 0
+
+=== TASK 3: prompts ===
+  zero-shot system prompt: 34 estimated tokens; few-shot: 123 estimated tokens
+
+=== TASKS 4-6: resilient, validated runs (no token budget) ===
+
+--- run 'zero-shot' (token budget 1000000000) ---
+  retry ticket=T0002 retry_number=0 wait=0.0530s
+  retry ticket=T0116 retry_number=0 wait=0.0453s
+  retry ticket=T0153 retry_number=0 wait=0.0484s
+  retry ticket=T0039 retry_number=0 wait=0.0478s
+  retry ticket=T0152 retry_number=0 wait=0.0542s
+  retry ticket=T0043 retry_number=0 wait=0.0535s
+  retry ticket=T0111 retry_number=0 wait=0.0562s
+  retry ticket=T0155 retry_number=0 wait=0.0461s
+  retry ticket=T0100 retry_number=0 wait=0.0503s
+  retry ticket=T0068 retry_number=0 wait=0.0454s
+  retry ticket=T0135 retry_number=0 wait=0.0477s
+  retry ticket=T0009 retry_number=0 wait=0.0513s
+  retry ticket=T0067 retry_number=0 wait=0.0453s
+  retry ticket=T0106 retry_number=0 wait=0.0475s
+  retry ticket=T0097 retry_number=0 wait=0.0531s
+  retry ticket=T0003 retry_number=0 wait=0.0518s
+  retry ticket=T0019 retry_number=0 wait=0.0478s
+  retry ticket=T0086 retry_number=0 wait=0.0524s
+  retry ticket=T0065 retry_number=0 wait=0.0551s
+  [zero-shot] statuses: {'classified_json': 135, 'classified_keyword': 12, 'flagged_invalid_output': 9, 'skipped_empty': 4, 'flagged_long': 4}
+  [zero-shot] classified 147, correct 126, accuracy 85.7%, total tokens 9712, tokens per classified ticket 66.1, transient errors recovered 19
+
+--- run 'few-shot' (token budget 1000000000) ---
+  retry ticket=T0002 retry_number=0 wait=0.0451s
+  retry ticket=T0116 retry_number=0 wait=0.0551s
+  retry ticket=T0153 retry_number=0 wait=0.0537s
+  retry ticket=T0039 retry_number=0 wait=0.0493s
+  retry ticket=T0152 retry_number=0 wait=0.0469s
+  retry ticket=T0043 retry_number=0 wait=0.0570s
+  retry ticket=T0111 retry_number=0 wait=0.0492s
+  retry ticket=T0155 retry_number=0 wait=0.0462s
+  retry ticket=T0100 retry_number=0 wait=0.0462s
+  retry ticket=T0068 retry_number=0 wait=0.0556s
+  retry ticket=T0135 retry_number=0 wait=0.0525s
+  retry ticket=T0009 retry_number=0 wait=0.0551s
+  retry ticket=T0067 retry_number=0 wait=0.0541s
+  retry ticket=T0106 retry_number=0 wait=0.0517s
+  retry ticket=T0097 retry_number=0 wait=0.0572s
+  retry ticket=T0003 retry_number=0 wait=0.0497s
+  retry ticket=T0019 retry_number=0 wait=0.0519s
+  retry ticket=T0086 retry_number=0 wait=0.0554s
+  retry ticket=T0065 retry_number=0 wait=0.0527s
+  [few-shot] statuses: {'classified_json': 135, 'classified_keyword': 12, 'flagged_invalid_output': 9, 'skipped_empty': 4, 'flagged_long': 4}
+  [few-shot] classified 147, correct 147, accuracy 100.0%, total tokens 23596, tokens per classified ticket 160.5, transient errors recovered 19
+  [OK ] transient errors (zero-shot): got 19  reference 19
+  [OK ] status counts (zero-shot) json/keyword/invalid: got (135, 12, 9)  reference (135, 12, 9)
+  [OK ] status counts (few-shot) json/keyword/invalid: got (135, 12, 9)  reference (135, 12, 9)
+  [OK ] classified tickets: got 147  reference 147
+  [OK ] zero-shot accuracy %: got 85.7  reference 85.7
+  [OK ] few-shot accuracy %: got 100.0  reference 100.0
+  every logged wait lies inside its jitter range (0.9x..1.15x of BASE_DELAY*2**n): True
+  retry waits range from 0.0453s to 0.0562s; all retried calls succeeded on retry number 0
+  zero-shot confusion (true -> predicted): {('fraud', 'billing'): 11, ('technical', 'billing'): 10}
+
+=== TASK 7: budget, routing and output ===
+
+--- run 'zero-shot budget demo' (token budget 6000) ---
+  retry ticket=T0002 retry_number=0 wait=0.0558s
+  retry ticket=T0116 retry_number=0 wait=0.0522s
+  retry ticket=T0153 retry_number=0 wait=0.0538s
+  retry ticket=T0039 retry_number=0 wait=0.0456s
+  retry ticket=T0152 retry_number=0 wait=0.0478s
+  retry ticket=T0043 retry_number=0 wait=0.0486s
+  retry ticket=T0111 retry_number=0 wait=0.0460s
+  retry ticket=T0155 retry_number=0 wait=0.0479s
+  retry ticket=T0100 retry_number=0 wait=0.0463s
+  retry ticket=T0068 retry_number=0 wait=0.0485s
+  retry ticket=T0135 retry_number=0 wait=0.0529s
+  retry ticket=T0009 retry_number=0 wait=0.0496s
+  TOKEN_BUDGET = 6000: tokens used 6049; budget_exhausted tickets: 59; statuses {'classified_json': 85, 'budget_exhausted': 59, 'classified_keyword': 7, 'flagged_invalid_output': 5, 'skipped_empty': 4, 'flagged_long': 4}
+
+--- run 'few-shot final' (token budget 100000) ---
+  retry ticket=T0002 retry_number=0 wait=0.0496s
+  retry ticket=T0116 retry_number=0 wait=0.0476s
+  retry ticket=T0153 retry_number=0 wait=0.0483s
+  retry ticket=T0039 retry_number=0 wait=0.0567s
+  retry ticket=T0152 retry_number=0 wait=0.0531s
+  retry ticket=T0043 retry_number=0 wait=0.0526s
+  retry ticket=T0111 retry_number=0 wait=0.0471s
+  retry ticket=T0155 retry_number=0 wait=0.0541s
+  retry ticket=T0100 retry_number=0 wait=0.0470s
+  retry ticket=T0068 retry_number=0 wait=0.0497s
+  retry ticket=T0135 retry_number=0 wait=0.0574s
+  retry ticket=T0009 retry_number=0 wait=0.0530s
+  retry ticket=T0067 retry_number=0 wait=0.0520s
+  retry ticket=T0106 retry_number=0 wait=0.0536s
+  retry ticket=T0097 retry_number=0 wait=0.0555s
+  retry ticket=T0003 retry_number=0 wait=0.0547s
+  retry ticket=T0019 retry_number=0 wait=0.0479s
+  retry ticket=T0086 retry_number=0 wait=0.0454s
+  retry ticket=T0065 retry_number=0 wait=0.0489s
+  [final] statuses: {'classified_json': 135, 'classified_keyword': 12, 'flagged_invalid_output': 9, 'skipped_empty': 4, 'flagged_long': 4}
+  [final] classified 147, correct 147, accuracy 100.0%, total tokens 23596, tokens per classified ticket 160.5, transient errors recovered 19
+  wrote outputs/triage_results.csv rows=164
+  routing counts: {('human_review', 'NORMAL'): 17, ('premium_desk', 'HIGH'): 11, ('security_team', 'HIGH'): 34, ('support_queue', 'NORMAL'): 102}
+  rows by status -> route: {('classified_json', 'premium_desk'): 10, ('classified_json', 'security_team'): 31, ('classified_json', 'support_queue'): 94, ('classified_keyword', 'premium_desk'): 1, ('classified_keyword', 'security_team'): 3, ('classified_keyword', 'support_queue'): 8, ('flagged_invalid_output', 'human_review'): 9, ('flagged_long', 'human_review'): 4, ('skipped_empty', 'human_review'): 4}
+
+  few-shot cost: 123 tokens of system prompt vs 34 for zero-shot, 160.5 tokens per classified ticket vs 66.1 for zero-shot
+  rule-validated outputs (classified_json + classified_keyword): 147; sent to humans: 17 (skipped_empty/flagged_long/flagged_invalid_output/budget_exhausted)
+  routing rules verified on all rows.
